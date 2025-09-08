@@ -1,0 +1,6 @@
+lead_id,name,email,phone,service_type,lead_source,status,created_at
+L001,John Smith,john@email.com,555-1001,Residential,Website,new,2024-12-01
+L002,Sarah Johnson,sarah@email.com,555-1002,Commercial,Referral,contacted,2024-12-02
+L003,Mike Wilson,mike@email.com,555-1003,Deep Cleaning,Google Ads,quoted,2024-12-03
+L004,Lisa Brown,lisa@email.com,555-1004,Carpet Cleaning,Social Media,converted,2024-12-04
+L005,David Lee,david@email.com,555-1005,Window Cleaning,Cold Call,lost,2024-12-05

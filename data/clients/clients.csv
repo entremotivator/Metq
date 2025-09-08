@@ -1,0 +1,6 @@
+client_id,name,email,phone,service_type,monthly_amount,status,created_at
+C001,ABC Office Complex,contact@abcoffice.com,555-0101,Commercial,3500,active,2024-01-31
+C002,Downtown Restaurant,manager@downtown.com,555-0102,Restaurant,2200,active,2024-02-29
+C003,Medical Center,admin@medcenter.com,555-0103,Healthcare,4800,active,2024-03-31
+C004,Retail Store,info@retailstore.com,555-0104,Retail,6200,renewal,2024-04-30
+C005,Manufacturing Plant,ops@manufacturing.com,555-0105,Industrial,8500,active,2024-05-31

@@ -1,0 +1,218 @@
+{
+  "lead_generation_workflow": {
+    "name": "Lead Generation Automation",
+    "description": "Automatically capture and process new leads from multiple sources",
+    "trigger": "webhook",
+    "nodes": [
+      {
+        "id": "webhook-trigger",
+        "type": "webhook",
+        "name": "Lead Capture Webhook",
+        "parameters": {
+          "path": "lead-capture",
+          "method": "POST"
+        }
+      },
+      {
+        "id": "data-validation",
+        "type": "function",
+        "name": "Validate Lead Data",
+        "parameters": {
+          "code": "// Validate required fields\nconst lead = items[0].json;\nif (!lead.name || !lead.email || !lead.phone) {\n  throw new Error('Missing required fields');\n}\nreturn [{ json: { ...lead, validated: true, created_at: new Date().toISOString() } }];"
+        }
+      },
+      {
+        "id": "save-to-csv",
+        "type": "csv",
+        "name": "Save Lead to CSV",
+        "parameters": {
+          "operation": "append",
+          "file": "data/clients/leads.csv"
+        }
+      },
+      {
+        "id": "send-notification",
+        "type": "email",
+        "name": "Notify Sales Team",
+        "parameters": {
+          "to": "sales@meticulousquality.com",
+          "subject": "New Lead Captured",
+          "body": "A new lead has been captured and requires follow-up."
+        }
+      }
+    ]
+  },
+  "appointment_scheduling_workflow": {
+    "name": "Smart Appointment Scheduling",
+    "description": "Automatically schedule appointments and send confirmations",
+    "trigger": "cron",
+    "nodes": [
+      {
+        "id": "cron-trigger",
+        "type": "cron",
+        "name": "Daily Schedule Check",
+        "parameters": {
+          "schedule": "0 9 * * *"
+        }
+      },
+      {
+        "id": "load-appointments",
+        "type": "csv",
+        "name": "Load Pending Appointments",
+        "parameters": {
+          "operation": "read",
+          "file": "data/clients/appointments.csv"
+        }
+      },
+      {
+        "id": "filter-today",
+        "type": "function",
+        "name": "Filter Today's Appointments",
+        "parameters": {
+          "code": "const today = new Date().toISOString().split('T')[0];\nreturn items.filter(item => item.json.date === today);"
+        }
+      },
+      {
+        "id": "send-reminders",
+        "type": "email",
+        "name": "Send Appointment Reminders",
+        "parameters": {
+          "template": "appointment_reminder"
+        }
+      }
+    ]
+  },
+  "customer_feedback_workflow": {
+    "name": "Customer Feedback Collection",
+    "description": "Automatically collect and analyze customer feedback",
+    "trigger": "webhook",
+    "nodes": [
+      {
+        "id": "feedback-webhook",
+        "type": "webhook",
+        "name": "Feedback Submission",
+        "parameters": {
+          "path": "customer-feedback",
+          "method": "POST"
+        }
+      },
+      {
+        "id": "sentiment-analysis",
+        "type": "function",
+        "name": "Analyze Sentiment",
+        "parameters": {
+          "code": "const feedback = items[0].json;\nconst sentiment = feedback.rating >= 4 ? 'positive' : feedback.rating >= 3 ? 'neutral' : 'negative';\nreturn [{ json: { ...feedback, sentiment, analyzed_at: new Date().toISOString() } }];"
+        }
+      },
+      {
+        "id": "save-feedback",
+        "type": "csv",
+        "name": "Save Feedback",
+        "parameters": {
+          "operation": "append",
+          "file": "data/clients/feedback.csv"
+        }
+      },
+      {
+        "id": "escalate-negative",
+        "type": "conditional",
+        "name": "Escalate Negative Feedback",
+        "parameters": {
+          "condition": "sentiment === 'negative'"
+        }
+      }
+    ]
+  },
+  "invoice_automation_workflow": {
+    "name": "Automated Invoice Generation",
+    "description": "Generate and send invoices automatically",
+    "trigger": "cron",
+    "nodes": [
+      {
+        "id": "monthly-trigger",
+        "type": "cron",
+        "name": "Monthly Invoice Generation",
+        "parameters": {
+          "schedule": "0 0 1 * *"
+        }
+      },
+      {
+        "id": "load-contracts",
+        "type": "csv",
+        "name": "Load Active Contracts",
+        "parameters": {
+          "operation": "read",
+          "file": "data/clients/contracts.csv"
+        }
+      },
+      {
+        "id": "generate-invoices",
+        "type": "function",
+        "name": "Generate Invoice Data",
+        "parameters": {
+          "code": "return items.filter(item => item.json.status === 'active').map(contract => ({\n  json: {\n    client_id: contract.json.client_id,\n    amount: contract.json.monthly_amount,\n    invoice_number: `INV-${Date.now()}-${contract.json.client_id}`,\n    due_date: new Date(Date.now() + 30*24*60*60*1000).toISOString(),\n    created_at: new Date().toISOString()\n  }\n}));"
+        }
+      },
+      {
+        "id": "save-invoices",
+        "type": "csv",
+        "name": "Save Invoices",
+        "parameters": {
+          "operation": "append",
+          "file": "data/clients/invoices.csv"
+        }
+      },
+      {
+        "id": "send-invoices",
+        "type": "email",
+        "name": "Send Invoice Emails",
+        "parameters": {
+          "template": "invoice_email"
+        }
+      }
+    ]
+  },
+  "quality_control_workflow": {
+    "name": "Quality Control Automation",
+    "description": "Automated quality checks and follow-ups",
+    "trigger": "webhook",
+    "nodes": [
+      {
+        "id": "service-completion",
+        "type": "webhook",
+        "name": "Service Completion Trigger",
+        "parameters": {
+          "path": "service-completed",
+          "method": "POST"
+        }
+      },
+      {
+        "id": "schedule-qc-check",
+        "type": "function",
+        "name": "Schedule Quality Check",
+        "parameters": {
+          "code": "const service = items[0].json;\nconst qcDate = new Date(Date.now() + 24*60*60*1000);\nreturn [{ json: { ...service, qc_scheduled: qcDate.toISOString() } }];"
+        }
+      },
+      {
+        "id": "send-qc-survey",
+        "type": "email",
+        "name": "Send Quality Survey",
+        "parameters": {
+          "template": "quality_survey",
+          "delay": "24h"
+        }
+      },
+      {
+        "id": "track-response",
+        "type": "csv",
+        "name": "Track Survey Response",
+        "parameters": {
+          "operation": "append",
+          "file": "data/clients/quality_checks.csv"
+        }
+      }
+    ]
+  }
+}
+
